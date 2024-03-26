@@ -4,8 +4,14 @@ int main()
 {
     char prompt[] = ">>> ";
 
-    char *output = readline(prompt);
-
-    // printf("%s\n", output);
-    free(output);
+    while (true)
+    {
+        char *output = readline(prompt);
+        if (strcmp(output, "exit\n") == 0)
+        {
+            free(output);
+            break;
+        }
+        free(output);
+    }
 }
