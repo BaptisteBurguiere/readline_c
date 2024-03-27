@@ -12,6 +12,7 @@ int main()
             free(output);
             break;
         }
+        add_history(output);
         free(output);
     }
 }

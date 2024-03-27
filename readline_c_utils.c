@@ -57,7 +57,7 @@ void add_char(input *input, char c)
     if (input->index == strlen(input->input))
     {
         input->input[input->index] = c;
-        input->index += 1;
+        printf("%c", c);
     }
     else
     {
@@ -65,16 +65,23 @@ void add_char(input *input, char c)
             input->input[i] = input->input[i - 1];
         
         input->input[input->index] = c;
+        char *cap = tgetstr("im", NULL);
+        tputs(cap, 1, putchar);
+        printf("%c", c);
+        cap = tgetstr("ei", NULL);
+        tputs(cap, 1, putchar);
     }
+    input->index += 1;
+    fflush(stdout);
 }
 
-void remove_char(input *input)
+void remove_char(input *input, char *prompt)
 {
+    if (input->index == 0)
+        return;
+
     if (input->index == strlen(input->input))
-    {
-        input->input[input->index] = 0;
-        input->index -= 1;
-    }
+        input->input[input->index - 1] = 0;
     else
     {
         for (size_t i = input->index; i < strlen(input->input) - 1; i++)
@@ -82,13 +89,74 @@ void remove_char(input *input)
         
         input->input[input->index] = 0;
     }
+    move_left(input, prompt);
+    char *cap = tgetstr("dc", NULL);
+    tputs(cap, 1, putchar);
+    fflush(stdout);
 }
 
-void refresh_line(input *input, char *prompt, size_t len)
+void move_left(input *input, char *prompt)
 {
-    for (size_t i = len; i > 0; i--)
-        printf("\b ");
+    if (input->index > 0)
+    {
+        int nb_col = tgetnum("co");
+        if ((input->index + strlen(prompt)) % nb_col == 0)
+        {
+            char *cap = tgetstr("up", NULL);
+            tputs(cap, 1, putchar);
+            cap = tgetstr("cr", NULL);
+            tputs(cap, 1, putchar);
+            cap = tgetstr("nd", NULL);
+            for (int i = 0; i < nb_col; i++)
+                tputs(cap, 1, putchar);
+        }
+        else
+        {
+            char *cap = tgetstr("le", NULL);
+            tputs(cap, 1, putchar);
+        }
+        fflush(stdout);
+        input->index -= 1;
+    }
+}
+
+void move_right(input *input)
+{
+    if (input->index < strlen(input->input))
+    {
+        char *cap = tgetstr("nd", NULL);
+        tputs(cap, 1, putchar);
+        fflush(stdout);
+        input->index += 1;
+    }
+}
+
+void del_input(input *input, char *prompt)
+{
+    for (size_t i = input->index; i > 0; i--)
+        remove_char(input, prompt);
+}
+
+void history_prev(input *input, char *prompt, History *history)
+{
+    if (history->nb_history < 1 || history->index < 1)
+        return;
     
-    printf("%s%s", prompt, input->input);
-    fflush(stdout);
+    del_input(input, prompt);
+    history->index -= 1;
+    for (size_t i = 0; i < strlen(history->history[history->index]); i++)
+        add_char(input, history->history[history->index][i]);    
+}
+
+void history_next(input *input, char *prompt, History *history)
+{
+    if (history->nb_history < 1 || history->index >= history->nb_history)
+        return;
+
+    del_input(input, prompt);
+    history->index += 1;
+    if (history->index >= history->nb_history)
+        return;
+    for (size_t i = 0; i < strlen(history->history[history->index]); i++)
+        add_char(input, history->history[history->index][i]);
 }

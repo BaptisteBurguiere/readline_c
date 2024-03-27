@@ -12,15 +12,6 @@
 # include <unistd.h>
 # include <ctype.h>
 
-# define INPUT_SIZE 64
-
-typedef struct input
-{
-    char    *input;
-    size_t  index;
-    size_t  size;
-}   input;
-
 char        *readline(char *prompt);
 void        add_history(char *str);
 void        destroy_history(void);

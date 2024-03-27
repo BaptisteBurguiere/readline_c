@@ -1,10 +1,19 @@
 #include "readline_c_utils.h"
 
-char    **history = NULL;
-size_t  nb_history = 0;
+History history = {NULL, 0, 0};
 
 char *readline(char *prompt)
 {
+    static bool is_first = true;
+
+    if (is_first)
+    {
+        if (!init_terminal())
+            return NULL;
+        is_first = false;
+    }
+
+    history.index = history.nb_history;
     printf("%s", prompt);
     fflush(stdout);
 
@@ -25,17 +34,17 @@ char *readline(char *prompt)
                     // Handle arrow keys
                     switch (ch) {
                         case 'A': // Up arrow
-                            // Implement your logic here
+                            history_prev(&input, prompt, &history);
                             break;
                         case 'B': // Down arrow
-                            // Implement your logic here
+                            history_next(&input, prompt, &history);
                             break;
-                        case 'C': // Right arrow
-                            // Implement your logic here
-                            break;
-                        case 'D': // Left arrow
-                            printf("\b");
-                            break;
+                        // case 'C': // Right arrow
+                        //     move_right(&input);
+                        //     break;
+                        // case 'D': // Left arrow
+                        //     move_left(&input, prompt);
+                        //     break;
                         default:
                             break;
                     }
@@ -43,40 +52,31 @@ char *readline(char *prompt)
             }
         }
         else if (ch == 127) // Backspace
-        {
-            if (input.index > 0)
-            {
-                remove_char(&input);
-                refresh_line(&input, prompt, strlen(prompt) + strlen(input.input) + 1);
-            }
-        }
+            remove_char(&input, prompt);
         else if (isprint(ch)) // Printable character
-        {
             add_char(&input, ch);
-            refresh_line(&input, prompt, strlen(prompt) + strlen(input.input));
-        }
     }
     
     tcsetattr(STDIN_FILENO, TCSANOW, &original_termios); // Restore original terminal settings
 
     putchar('\n');
-    return input.input; // Return input as a dynamically allocated string
+    return input.input;
 }
 
 void add_history(char *str)
 {
-    if (!history)
-        history = calloc(2, sizeof(char *));
+    if (!history.history)
+        history.history = calloc(2, sizeof(char *));
     else
-        history = realloc(history, nb_history + 2);
+        history.history= realloc(history.history, (history.nb_history + 2) * sizeof(char *));
 
-    history[nb_history] = strdup(str);
-    nb_history++;
+    history.history[history.nb_history] = strdup(str);
+    history.nb_history++;
 }
 
 void destroy_history(void)
 {
-    for (size_t i = 0; i < nb_history; i++)
-        free(history[i]);
-    free(history);
+    for (size_t i = 0; i < history.nb_history; i++)
+        free(history.history[i]);
+    free(history.history);
 }
