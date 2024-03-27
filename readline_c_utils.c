@@ -67,9 +67,11 @@ void add_char(input *input, char c)
         input->input[input->index] = c;
         char *cap = tgetstr("im", NULL);
         tputs(cap, 1, putchar);
+        free(cap);
         printf("%c", c);
         cap = tgetstr("ei", NULL);
         tputs(cap, 1, putchar);
+        free(cap);
     }
     input->index += 1;
     fflush(stdout);
@@ -92,6 +94,7 @@ void remove_char(input *input, char *prompt)
     move_left(input, prompt);
     char *cap = tgetstr("dc", NULL);
     tputs(cap, 1, putchar);
+    free(cap);
     fflush(stdout);
 }
 
@@ -104,16 +107,20 @@ void move_left(input *input, char *prompt)
         {
             char *cap = tgetstr("up", NULL);
             tputs(cap, 1, putchar);
+            free(cap);
             cap = tgetstr("cr", NULL);
             tputs(cap, 1, putchar);
+            free(cap);
             cap = tgetstr("nd", NULL);
             for (int i = 0; i < nb_col; i++)
                 tputs(cap, 1, putchar);
+            free(cap);
         }
         else
         {
             char *cap = tgetstr("le", NULL);
             tputs(cap, 1, putchar);
+            free(cap);
         }
         fflush(stdout);
         input->index -= 1;
@@ -126,6 +133,7 @@ void move_right(input *input)
     {
         char *cap = tgetstr("nd", NULL);
         tputs(cap, 1, putchar);
+        free(cap);
         fflush(stdout);
         input->index += 1;
     }
@@ -159,4 +167,33 @@ void history_next(input *input, char *prompt, History *history)
         return;
     for (size_t i = 0; i < strlen(history->history[history->index]); i++)
         add_char(input, history->history[history->index][i]);
+}
+
+char *get_dir(char *input)
+{
+    char *path = calloc(strlen(input) + 2, sizeof(char));
+    size_t j = 0;
+    size_t start = 0;
+
+    if (input[0] != '/')
+    {
+        
+    }
+
+    size_t end = strlen(input) - 1;
+    while (input[end] != '/')
+        end--;
+
+    for (size_t i = start; i < end; i++)
+    {
+        path[j] = input[i];
+        j++;
+    }
+
+    return path;
+}
+
+void auto_complete(input *input, char *prompt)
+{
+    char *path = get_dir(input->input);
 }

@@ -29,6 +29,6 @@ void    move_right(input *input);
 void    history_prev(input *input, char *prompt, History *history);
 void    history_next(input *input, char *prompt, History *history);
 void    del_input(input *input, char *prompt);
-History init_history(void);
+void    auto_complete(input *input, char *prompt);
 
 #endif

@@ -7,12 +7,14 @@ int main()
     while (true)
     {
         char *output = readline(prompt);
-        if (strcmp(output, "exit\n") == 0)
+        if (strcmp(output, "exit") == 0)
         {
             free(output);
             break;
         }
-        add_history(output);
+        if (strlen(output) > 0)
+            add_history(output);
         free(output);
     }
+    destroy_history();
 }

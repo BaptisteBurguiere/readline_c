@@ -53,6 +53,8 @@ char *readline(char *prompt)
         }
         else if (ch == 127) // Backspace
             remove_char(&input, prompt);
+        else if (ch == '\t') // Tab
+            auto_complete(&input, prompt);
         else if (isprint(ch)) // Printable character
             add_char(&input, ch);
     }
