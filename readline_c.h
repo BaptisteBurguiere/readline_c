@@ -11,6 +11,7 @@
 # include <sys/select.h>
 # include <unistd.h>
 # include <ctype.h>
+# include <dirent.h>
 
 char        *readline(char *prompt);
 void        add_history(char *str);
