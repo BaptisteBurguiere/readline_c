@@ -3,7 +3,7 @@
 Returns input from the user.
 Support for auto completion with TAB and history with up and down arrows.
 
-DO NOT SUPPORT right and left arrows to write in the input
+DO NOT SUPPORT left and right arrows yet
 
 ## Installation
 
