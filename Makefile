@@ -1,21 +1,26 @@
-NAME=a.out
-CC=gcc
-FLAGS=-Wall -Wextra -Werror -g
-SRCS=$(wildcard *.c)
-OBJS=$(patsubst %.c,%.o,$(SRCS))
+NAME = libreadline_c.a
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror -g
 
-${NAME} : ${OBJS}
-	$(CC) $(OBJS) -lcurses -o $(NAME)
+CFILES = readline_c.c \
+		readline_c_utils.c \
+
+OFILES = $(CFILES:.c=.o)
+
+$(NAME): $(OFILES)
+	ar rcs $(NAME) $(OFILES)
+
+all: $(NAME) clean
 
 .c.o :
-	$(CC) ${FLAGS} -c $< -o ${<:.c=.o}
+	$(CC) $(CFLAGS) -c $< -o ${<:.c=.o}
 
-all : ${NAME}
+clean:
+	rm -f $(OFILES)
 
-clean :
-	rm -rf ${OBJS}
+fclean: clean
+	rm -f $(NAME)
 
-fclean : clean
-	rm -rf ${NAME}
+re: fclean $(NAME)
 
-re : fclean all
+.PHONY:  all clean fclean re

@@ -81,4 +81,5 @@ void destroy_history(void)
     for (size_t i = 0; i < history.nb_history; i++)
         free(history.history[i]);
     free(history.history);
+    history.history = NULL;
 }

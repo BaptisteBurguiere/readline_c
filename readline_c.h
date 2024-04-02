@@ -13,8 +13,13 @@
 # include <ctype.h>
 # include <dirent.h>
 
+// Main function: take a prompt as parameter and returns the user input
 char        *readline(char *prompt);
+
+// Add a string to the history
 void        add_history(char *str);
+
+// Free history
 void        destroy_history(void);
 
 #endif
